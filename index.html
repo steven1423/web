@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Image Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            width: 80%;
+            background-color: white;
+        }
+        
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 200px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        #image-display {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 5px;
+            display: none;
+            transition: transform 0.3s;
+        }
+        
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        /* Enhanced Fireworks styles */
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: explode 1.5s ease-out forwards;
+            box-shadow: 0 0 10px 2px currentColor;
+        }
+        
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0.2);
+                opacity: 0;
+            }
+        }
+        
+        .jump {
+            animation: jump 0.5s ease;
+        }
+        
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+        
+        .special-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px #ff00ff, 
+                         0 0 20px #00ffff,
+                         0 0 30px #ffff00;
+            z-index: 100;
+            opacity: 0;
+            animation: textFade 3s ease-in-out;
+        }
+        
+        @keyframes textFade {
+            0%, 100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resolution Selector</h1>
+        <p>Choose from smallest to biggest</p>
+        
+        <select id="image-selector">
+            <option value="">-- Select an option --</option>
+            <option value="image1">144p</option>
+            <option value="image2">240p</option>
+            <option value="image3">480p</option>
+            <option value="image4">720p</option>
+            <option value="image5">1080p</option>
+        </select>
+        
+        <div class="image-container">
+            <img id="image-display" alt="Selected image will appear here">
+        </div>
+    </div>
+
+    <script>
+        const imageSelector = document.getElementById('image-selector');
+        const imageDisplay = document.getElementById('image-display');
+        
+        // Update these paths to match your local image files
+        const imageMap = {
+            'image1': '1.jpg',
+            'image2': '144.jpg',
+            'image3': '240.jpg',
+            'image4': '480.jpg',
+            'image5': '1.jpg'
+        };
+        
+        // Array of images to cycle through after image5
+
+        let currentImageIndex = 0;
+        
+        function createFirework(x, y) {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${x}px`;
+            firework.style.top = `${y}px`;
+            firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            firework.style.color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // Random direction and distance (bigger explosions)
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 200;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            firework.style.setProperty('--tx', `${tx}px`);
+            firework.style.setProperty('--ty', `${ty}px`);
+            
+            // Random size for variety
+            const size = 5 + Math.random() * 15;
+            firework.style.width = `${size}px`;
+            firework.style.height = `${size}px`;
+            
+            document.body.appendChild(firework);
+            
+            // Remove after animation completes
+            setTimeout(() => {
+                firework.remove();
+            }, 1500);
+        }
+        
+        function showSpecialText() {
+            const text = document.createElement('div');
+            text.className = 'special-text';
+            text.textContent = 'My belongs to you';
+            document.body.appendChild(text);
+            
+            // Remove after animation
+            setTimeout(() => {
+                text.remove();
+            }, 5000);
+        }
+        
+        function triggerFireworks() {
+            // Show special text
+            showSpecialText();
+            
+            // Create 100 fireworks in random positions (more fireworks)
+            for (let i = 0; i < 1000; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    createFirework(x, y);
+                    
+                    // Create additional fireworks in bursts
+                    if (i % 10 === 0) {
+                        for (let j = 0; j < 5; j++) {
+                            setTimeout(() => {
+                                createFirework(x + (Math.random() * 100 - 50), 
+                                             y + (Math.random() * 100 - 50));
+                            }, j * 100);
+                        }
+                    }
+                }, i * 30); // Faster fireworks
+            }
+            
+            // Make the image jump higher
+            imageDisplay.classList.add('jump');
+            setTimeout(() => {
+                imageDisplay.classList.remove('jump');
+            }, 500);
+        }
+        
+        function showNextImage() {
+    // Always show 2.jpg after the fireworks
+    imageDisplay.src = '2.jpg';
+    imageDisplay.style.display = 'block';
+    // Set the selector to empty (or you could set it to match if you prefer)
+    imageSelector.value = '';
+}
+        
+        imageSelector.addEventListener('change', function() {
+            const selectedValue = this.value;
+            
+            if (selectedValue && imageMap[selectedValue]) {
+                imageDisplay.src = imageMap[selectedValue];
+                imageDisplay.style.display = 'block';
+                
+                if (selectedValue === 'image5') {
+                    // Wait 3 seconds then trigger fireworks and switch image
+                    setTimeout(() => {
+                        triggerFireworks();
+                        setTimeout(showNextImage, 1000); // Give more time for fireworks
+                    }, 1000);
+                }
+            } else {
+                imageDisplay.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
